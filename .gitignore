@@ -34,7 +34,6 @@ lint_results_tmp.txt
 
 # Python backend
 backend/.env
-backend/*.db
 backend/__pycache__/
 backend/*.pyc
 .venv/

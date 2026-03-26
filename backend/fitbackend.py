@@ -60,9 +60,9 @@ def signup():
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
-    name = data.get('name')
-    email = data.get('email')
-    password = data.get('password')
+    name = data.get('name', '').strip()
+    email = data.get('email', '').strip().lower()
+    password = data.get('password', '').strip()
 
     if not all([name, email, password]):
         return jsonify({"error": "Missing required fields"}), 400
@@ -98,8 +98,8 @@ def login():
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
-    email = data.get('email')
-    password = data.get('password')
+    email = data.get('email', '').strip().lower()
+    password = data.get('password', '').strip()
 
     if not all([email, password]):
         return jsonify({"error": "Missing email or password"}), 400
