@@ -1,4 +1,4 @@
-<img width="1919" height="965" alt="Screenshot 2026-03-26 150323" src="https://github.com/user-attachments/assets/5b49c15d-b321-49bf-885d-77f35124c5f1" /># 🧠 FitMind — AI-Powered Fitness Platform
+<img width="1919" height="959" alt="Screenshot 2026-03-26 150240" src="https://github.com/user-attachments/assets/3d496bfe-362d-4658-8c7e-f6a896192934" /># 🧠 FitMind — AI-Powered Fitness Platform
 
 A full-stack, AI-driven fitness web application with a beautiful glassmorphism UI. Get personalized meal plans, workout programs, exercise form analysis via video, and a 24/7 AI coach — all powered by **Groq Llama 3**.
 
@@ -108,7 +108,7 @@ Get your free key at → https://console.groq.com
 <img width="1919" height="961" alt="Screenshot 2026-03-26 150310" src="https://github.com/user-attachments/assets/1305d059-dfd8-4e3b-99c0-201ffddd4f38" />
 <img width="1919" height="965" alt="Screenshot 2026-03-26 150413" src="https://github.com/user-attachments/assets/614cb361-dac2-4f83-b336-3b52a92e27d3" />
 <img width="1919" height="952" alt="Screenshot 2026-03-26 150227" src="https://github.com/user-attachments/assets/276a5150-fadf-4dfa-98e5-6bbdf05e4b93" />
-Uploading Screenshot 2026-03-26 150323.png…]()
+
 
 ---
 
