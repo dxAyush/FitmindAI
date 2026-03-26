@@ -10,7 +10,7 @@ import SectionHeader from './SectionHeader';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, CheckCircle2, AlertCircle, Activity, ShieldCheck, RotateCcw, Eye, Zap } from 'lucide-react';
 
-const API_BASE = 'http://127.0.0.1:5000';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
 
 // Extract a frame from the video at a given time (seconds) as a base64 JPEG
 function extractFrame(videoEl, timeSeconds, quality = 0.82) {
