@@ -297,8 +297,9 @@ Be specific to what you see, not generic. If the image is blurry or unclear, sti
 
 
 if __name__ == '__main__':
-    print(f"FitMind API Server starting on http://127.0.0.1:5000")
+    port = int(os.getenv('PORT', 5000))
+    print(f"FitMind API Server starting on http://0.0.0.0:{port}")
     print(f"Data will be stored locally in: {DB_FILE}")
     print(f"API Key loaded: {'✅ Yes' if os.getenv('GROQ_API_KEY') else '❌ No — add GROQ_API_KEY to .env!'}")
-    app.run(debug=True, port=5000)
+    app.run(host='0.0.0.0', port=port, debug=False)
 
