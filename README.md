@@ -41,27 +41,30 @@ cd fitmind-react
 
 ### 2. Set up the backend
 ```bash
+# Go into the backend folder
+cd backend
+
 # Install Python dependencies
-pip install flask flask-cors pyjwt werkzeug requests python-dotenv
+pip install -r requirements.txt
 
-# Create .env file with your Groq key
-echo "GROQ_API_KEY=your_groq_api_key_here" > ../FITMIND/.env
+# Copy the env example and add your Groq key
+copy .env.example .env
+# Open .env and paste your real GROQ_API_KEY
 
-# Start the backend (from the FITMIND folder)
-python ../FITMIND/fitbackend.py
+# Start the backend
+python fitbackend.py
 ```
 
 ### 3. Set up the frontend
 ```bash
+# Go back to root
+cd ..
 npm install
 npm run dev
 ```
 
-### 4. Open the app
-- Frontend: **http://localhost:5173**
-- Backend API: **http://localhost:5000**
-
-> ⚠️ **The backend must be running** for AI features to work. Sign up for an account on first launch.
+### 4. Or just double-click `start.bat` 🚀
+This will launch both backend and frontend automatically!
 
 ---
 
