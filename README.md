@@ -1,4 +1,4 @@
-# 🧠 FitMind — AI-Powered Fitness Platform
+<img width="1919" height="965" alt="Screenshot 2026-03-26 150323" src="https://github.com/user-attachments/assets/5b49c15d-b321-49bf-885d-77f35124c5f1" /># 🧠 FitMind — AI-Powered Fitness Platform
 
 A full-stack, AI-driven fitness web application with a beautiful glassmorphism UI. Get personalized meal plans, workout programs, exercise form analysis via video, and a 24/7 AI coach — all powered by **Groq Llama 3**.
 
@@ -98,7 +98,17 @@ Get your free key at → https://console.groq.com
 
 ## 📸 Screenshots
 
-> Coming soon
+> 
+![<img width="1903" height="955" alt="Screenshot 2026-03-26 150334" src="https://github.com/user-attachments/assets/27f29d06-d5a1-4483-93c3-3e8fd58bed9f" />
+<img width="1919" height="959" alt="Screenshot 2026-03-26 150240" src="https://github.com/user-attachments/assets/68c7db8b-8dd1-476a-b6e5-e314b0684077" />
+<img width="1919" height="965" alt="Screenshot 2026-03-26 150344" src="https://github.com/user-attachments/assets/9bd8828c-26cc-4594-a2fc-7d1fba9a9023" />
+<img width="1919" height="960" alt="Screenshot 2026-03-26 150353" src="https://github.com/user-attachments/assets/ea0798f8-fb68-4041-82e9-6ad234861cd5" />
+<img width="1917" height="966" alt="Screenshot 2026-03-26 150255" src="https://github.com/user-attachments/assets/f9dcab2f-eb67-4260-9814-5091f4709d04" />
+<img width="1919" height="971" alt="Screenshot 2026-03-26 150402" src="https://github.com/user-attachments/assets/c5a8ae40-71e8-422a-83ef-911ea110874d" />
+<img width="1919" height="961" alt="Screenshot 2026-03-26 150310" src="https://github.com/user-attachments/assets/1305d059-dfd8-4e3b-99c0-201ffddd4f38" />
+<img width="1919" height="965" alt="Screenshot 2026-03-26 150413" src="https://github.com/user-attachments/assets/614cb361-dac2-4f83-b336-3b52a92e27d3" />
+<img width="1919" height="952" alt="Screenshot 2026-03-26 150227" src="https://github.com/user-attachments/assets/276a5150-fadf-4dfa-98e5-6bbdf05e4b93" />
+Uploading Screenshot 2026-03-26 150323.png…]()
 
 ---
 
