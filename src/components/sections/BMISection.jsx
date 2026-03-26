@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -39,14 +39,28 @@ function BMIGauge({ color, rotation, dashLength }) {
 }
 
 export default function BMISection() {
-  const [unit, setUnit] = useState('metric');
-  const [height, setHeight] = useState('');
-  const [weight, setWeight] = useState('');
-  const [age, setAge] = useState('');
-  const [gender, setGender] = useState('');
-  const [result, setResult] = useState(null);
-  const [insight, setInsight] = useState('');
+  const [unit, setUnit] = useState(() => localStorage.getItem('fitmind_bmi_unit') || 'metric');
+  const [height, setHeight] = useState(() => localStorage.getItem('fitmind_bmi_height') || '');
+  const [weight, setWeight] = useState(() => localStorage.getItem('fitmind_bmi_weight') || '');
+  const [age, setAge] = useState(() => localStorage.getItem('fitmind_bmi_age') || '');
+  const [gender, setGender] = useState(() => localStorage.getItem('fitmind_bmi_gender') || '');
+  const [result, setResult] = useState(() => {
+    const saved = localStorage.getItem('fitmind_bmi_result');
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [insight, setInsight] = useState(() => localStorage.getItem('fitmind_bmi_insight') || '');
   const [loading, setLoading] = useState(false);
+
+  // Persistence
+  useEffect(() => {
+    localStorage.setItem('fitmind_bmi_unit', unit);
+    localStorage.setItem('fitmind_bmi_height', height);
+    localStorage.setItem('fitmind_bmi_weight', weight);
+    localStorage.setItem('fitmind_bmi_age', age);
+    localStorage.setItem('fitmind_bmi_gender', gender);
+    localStorage.setItem('fitmind_bmi_insight', insight);
+    if (result) localStorage.setItem('fitmind_bmi_result', JSON.stringify(result));
+  }, [unit, height, weight, age, gender, result, insight]);
 
   const calculate = async () => {
     const h = parseFloat(height);

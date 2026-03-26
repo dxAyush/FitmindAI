@@ -90,25 +90,28 @@ export default function HeroSection() {
 
         {/* Feature Cards */}
         <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4 max-w-[800px] mx-auto">
-          {features.map(({ icon: Icon, title, desc, href, color }, i) => (
-            <motion.div
-              key={title}
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.8, ease: 'easeOut', delay: 1.1 + i * 0.1 }}
-              onClick={() => scrollTo(href)}
-              className="p-6 px-5 rounded-[20px] border border-white/[0.08] cursor-pointer transition-all duration-400 hover:-translate-y-2 hover:border-sage/30 hover:shadow-[0_20px_60px_rgba(0,0,0,0.8),0_8px_30px_rgba(122,173,110,0.15)] relative overflow-hidden group"
-              style={{
-                background: 'var(--glass-bg)',
-                backdropFilter: 'blur(20px)',
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-sage/[0.08] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <Icon className={`w-8 h-8 mb-4 block ${color}`} />
-              <div className="font-[var(--font-display)] text-[0.9rem] font-semibold text-cream mb-1 relative z-[1]">{title}</div>
-              <div className="text-[0.78rem] text-cream/50 leading-snug relative z-[1]">{desc}</div>
-            </motion.div>
-          ))}
+          {features.map((item, i) => {
+            const FeatureIcon = item.icon;
+            return (
+              <motion.div
+                key={item.title}
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.8, ease: 'easeOut', delay: 1.1 + i * 0.1 }}
+                onClick={() => scrollTo(item.href)}
+                className="p-6 px-5 rounded-[20px] border border-white/[0.08] cursor-pointer transition-all duration-400 hover:-translate-y-2 hover:border-sage/30 hover:shadow-[0_20px_60px_rgba(0,0,0,0.8),0_8px_30px_rgba(122,173,110,0.15)] relative overflow-hidden group"
+                style={{
+                  background: 'var(--glass-bg)',
+                  backdropFilter: 'blur(20px)',
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-sage/[0.08] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <FeatureIcon className={`w-8 h-8 mb-4 block ${item.color}`} />
+                <div className="font-[var(--font-display)] text-[0.9rem] font-semibold text-cream mb-1 relative z-[1]">{item.title}</div>
+                <div className="text-[0.78rem] text-cream/50 leading-snug relative z-[1]">{item.desc}</div>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
 

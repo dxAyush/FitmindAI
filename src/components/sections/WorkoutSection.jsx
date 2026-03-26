@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -69,9 +69,21 @@ function WorkoutDayItem({ day, index }) {
 }
 
 export default function WorkoutSection() {
-  const [form, setForm] = useState({ level: 'beginner', goal: 'weight_loss', days: '3', duration: '45', equipment: 'none', injuries: '' });
-  const [plan, setPlan] = useState(null);
+  const [form, setForm] = useState(() => {
+    const saved = localStorage.getItem('fitmind_workout_form');
+    return saved ? JSON.parse(saved) : { level: 'beginner', goal: 'weight_loss', days: '3', duration: '45', equipment: 'none', injuries: '' };
+  });
+  const [plan, setPlan] = useState(() => {
+    const saved = localStorage.getItem('fitmind_workout_plan');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [loading, setLoading] = useState(false);
+
+  // Persistence
+  useEffect(() => {
+    localStorage.setItem('fitmind_workout_form', JSON.stringify(form));
+    if (plan) localStorage.setItem('fitmind_workout_plan', JSON.stringify(plan));
+  }, [form, plan]);
 
   const update = (key, val) => setForm(f => ({ ...f, [key]: val }));
 

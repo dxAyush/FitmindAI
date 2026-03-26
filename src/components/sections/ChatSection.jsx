@@ -51,15 +51,26 @@ function TypingIndicator() {
 }
 
 export default function ChatSection() {
-  const [messages, setMessages] = useState([
-    { id: 'init', role: 'bot', text: "Hey there! I'm your FitMind AI coach. I can help with workout advice, nutrition tips, goal setting, recovery strategies, and so much more. What's on your mind today?" },
-  ]);
+  const [messages, setMessages] = useState(() => {
+    const saved = localStorage.getItem('fitmind_chat_messages');
+    return saved ? JSON.parse(saved) : [
+      { id: 'init', role: 'bot', text: "Hey there! I'm your FitMind AI coach. I can help with workout advice, nutrition tips, goal setting, recovery strategies, and so much more. What's on your mind today?" },
+    ];
+  });
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState(false);
   const messagesRef = useRef(null);
-  const chatHistoryRef = useRef([
-    { role: 'model', parts: [{ text: "Hello! I'm your FitMind AI coach." }] },
-  ]);
+  const chatHistoryRef = useRef(
+    JSON.parse(localStorage.getItem('fitmind_chat_history')) || [
+      { role: 'model', parts: [{ text: "Hello! I'm your FitMind AI coach." }] },
+    ]
+  );
+
+  // Persistence
+  useEffect(() => {
+    localStorage.setItem('fitmind_chat_messages', JSON.stringify(messages));
+    localStorage.setItem('fitmind_chat_history', JSON.stringify(chatHistoryRef.current));
+  }, [messages]);
 
   useEffect(() => {
     if (messagesRef.current) messagesRef.current.scrollTop = messagesRef.current.scrollHeight;

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -28,22 +28,37 @@ function MealCard({ day, index }) {
         { type: 'Lunch', icon: Sun, val: day.lunch },
         { type: 'Dinner', icon: Moon, val: day.dinner },
         { type: 'Snack', icon: Apple, val: day.snack },
-      ].map(({ type, icon: Icon, val }) => (
-        <div key={type} className="mb-3">
-          <div className="text-[0.72rem] font-semibold text-cream/50 uppercase tracking-wider mb-0.5 flex items-center gap-1.5">
-            <Icon className="w-3.5 h-3.5" /> {type}
+      ].map((item) => {
+        const MealIcon = item.icon;
+        return (
+          <div key={item.type} className="mb-3">
+            <div className="text-[0.72rem] font-semibold text-cream/50 uppercase tracking-wider mb-0.5 flex items-center gap-1.5">
+              <MealIcon className="w-3.5 h-3.5" /> {item.type}
+            </div>
+            <div className="text-sm text-cream/80 leading-snug">{item.val || '—'}</div>
           </div>
-          <div className="text-sm text-cream/80 leading-snug">{val || '—'}</div>
-        </div>
-      ))}
+        );
+      })}
     </motion.div>
   );
 }
 
 export default function DietSection() {
-  const [form, setForm] = useState({ age: '', weight: '', height: '', gender: '', goal: '', activity: '', dietType: 'balanced', allergies: '' });
-  const [plans, setPlans] = useState(null);
+  const [form, setForm] = useState(() => {
+    const saved = localStorage.getItem('fitmind_diet_form');
+    return saved ? JSON.parse(saved) : { age: '', weight: '', height: '', gender: '', goal: '', activity: '', dietType: 'balanced', allergies: '' };
+  });
+  const [plans, setPlans] = useState(() => {
+    const saved = localStorage.getItem('fitmind_diet_plan');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [loading, setLoading] = useState(false);
+
+  // Persistence
+  useEffect(() => {
+    localStorage.setItem('fitmind_diet_form', JSON.stringify(form));
+    if (plans) localStorage.setItem('fitmind_diet_plan', JSON.stringify(plans));
+  }, [form, plans]);
 
   const update = (key, val) => setForm(f => ({ ...f, [key]: val }));
 
