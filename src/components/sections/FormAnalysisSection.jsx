@@ -10,7 +10,8 @@ import SectionHeader from './SectionHeader';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, CheckCircle2, AlertCircle, Activity, ShieldCheck, RotateCcw, Eye, Zap } from 'lucide-react';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_BASE = import.meta.env.VITE_API_URL || (isLocal ? 'http://127.0.0.1:5000' : `http://${window.location.hostname}:5000`);
 
 // Extract a frame from the video at a given time (seconds) as a base64 JPEG
 function extractFrame(videoEl, timeSeconds, quality = 0.82) {

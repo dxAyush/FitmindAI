@@ -43,7 +43,8 @@ export default function AuthModal() {
 
       // After 2 seconds, close
       setTimeout(() => {
-        login(userName, data.token);
+        const email = mode === 'login' ? loginEmail : signupEmail;
+        login(userName, data.email || email, data.token);
         setWelcomeScreen(false);
         toast.success('Dashboard Ready!');
       }, 2000);

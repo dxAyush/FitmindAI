@@ -1,83 +1,96 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useAuth } from './useAuth';
 
 const DEFAULT_DATA = { weights: [], workouts: [], water: {}, calories: [] };
 
-// Always returns the current date string — prevents stale date if app stays open past midnight
 function getToday() {
   return new Date().toISOString().split('T')[0];
 }
 
-function loadProgress() {
+function getStoreKey(email) {
+  if (!email) return 'fitmind_progress_guest';
+  // Use a simple identifier derived from email
   try {
-    const parsed = JSON.parse(localStorage.getItem('fitmind_progress'));
+    return `fitmind_progress_u_${email.replace(/[^a-zA-Z0-9]/g, '_')}`;
+  } catch {
+    return 'fitmind_progress_guest';
+  }
+}
+
+function loadProgress(email) {
+  try {
+    const key = getStoreKey(email);
+    const parsed = JSON.parse(localStorage.getItem(key));
     if (!parsed) return { ...DEFAULT_DATA };
-    // Merge existing with defaults to prevent missing properties like calories
     return { ...DEFAULT_DATA, ...parsed };
   } catch {
     return { ...DEFAULT_DATA };
   }
 }
 
-// Persist data to localStorage and return newData (used in functional updaters)
-function persist(newData) {
-  localStorage.setItem('fitmind_progress', JSON.stringify(newData));
+function persist(newData, email) {
+  const key = getStoreKey(email);
+  localStorage.setItem(key, JSON.stringify(newData));
   return newData;
 }
 
 export function useProgress() {
-  const [data, setData] = useState(loadProgress);
+  const { userEmail } = useAuth();
+  const [data, setData] = useState(() => loadProgress(userEmail));
 
-  // All mutations use the functional updater form of setData so they always
-  // operate on the latest state — no stale closures, no lag.
+  // Sync state if user switches accounts
+  useEffect(() => {
+    setData(loadProgress(userEmail));
+  }, [userEmail]);
 
   const logWeight = useCallback((val, date) => {
-    setData(prev => persist({ ...prev, weights: [{ val, date }, ...prev.weights].slice(0, 30) }));
-  }, []);
+    setData(prev => persist({ ...prev, weights: [{ val, date }, ...prev.weights].slice(0, 30) }, userEmail));
+  }, [userEmail]);
 
   const deleteWeight = useCallback((index) => {
     setData(prev => {
       const newWeights = [...prev.weights];
       newWeights.splice(index, 1);
-      return persist({ ...prev, weights: newWeights });
+      return persist({ ...prev, weights: newWeights }, userEmail);
     });
-  }, []);
+  }, [userEmail]);
 
   const logWorkout = useCallback((type, mins) => {
-    const dateStr = new Date().toISOString().split('T')[0];
+    const dateStr = getToday();
     setData(prev => persist({
       ...prev,
       workouts: [{ type, mins, date: dateStr }, ...prev.workouts].slice(0, 50),
-    }));
-  }, []);
+    }, userEmail));
+  }, [userEmail]);
 
   const deleteWorkout = useCallback((index) => {
     setData(prev => {
       const newWorkouts = [...prev.workouts];
       newWorkouts.splice(index, 1);
-      return persist({ ...prev, workouts: newWorkouts });
+      return persist({ ...prev, workouts: newWorkouts }, userEmail);
     });
-  }, []);
+  }, [userEmail]);
 
   const logCalories = useCallback((item, cal, explanation) => {
-    const dateStr = new Date().toISOString().split('T')[0];
+    const dateStr = getToday();
     setData(prev => persist({
       ...prev,
       calories: [{ item, cal, explanation, date: dateStr }, ...(prev.calories || [])].slice(0, 50),
-    }));
-  }, []);
+    }, userEmail));
+  }, [userEmail]);
 
   const deleteCalories = useCallback((index) => {
     setData(prev => {
       const newCal = [...(prev.calories || [])];
       newCal.splice(index, 1);
-      return persist({ ...prev, calories: newCal });
+      return persist({ ...prev, calories: newCal }, userEmail);
     });
-  }, []);
+  }, [userEmail]);
 
   const setWater = useCallback((count) => {
-    const key = new Date().toISOString().split('T')[0];
-    setData(prev => persist({ ...prev, water: { ...prev.water, [key]: count } }));
-  }, []);
+    const key = getToday();
+    setData(prev => persist({ ...prev, water: { ...prev.water, [key]: count } }, userEmail));
+  }, [userEmail]);
 
   const getWaterToday = useCallback(() => {
     return data.water[getToday()] || 0;
@@ -111,35 +124,35 @@ export function useProgress() {
   const getAvgWater = useCallback(() => {
     let total = 0, days = 0;
     for (let i = 0; i < 7; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const key = d.toISOString().split('T')[0];
-      if (data.water[key]) { total += data.water[key]; days++; }
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const key = d.toISOString().split('T')[0];
+        if (data.water[key]) { total += data.water[key]; days++; }
     }
     return days ? ((total / days) * 0.25).toFixed(1) : '0.0';
   }, [data.water]);
 
   const getActivitySummary = useCallback(() => {
     const typeMap = {
-      cardio: ['run', 'jog', 'bike', 'cycle', 'swim', 'hike', 'walk', 'cardio', 'elliptical', 'rowing'],
-      strength: ['gym', 'lift', 'weight', 'bench', 'squat', 'deadlift', 'press', 'curl', 'strength', 'resistance'],
-      flexibility: ['yoga', 'stretch', 'pilates', 'flex', 'mobility'],
+        cardio: ['run', 'jog', 'bike', 'cycle', 'swim', 'hike', 'walk', 'cardio', 'elliptical', 'rowing'],
+        strength: ['gym', 'lift', 'weight', 'bench', 'squat', 'deadlift', 'press', 'curl', 'strength', 'resistance'],
+        flexibility: ['yoga', 'stretch', 'pilates', 'flex', 'mobility'],
     };
     const totals = { cardio: 0, strength: 0, flexibility: 0 };
     data.workouts.forEach(w => {
-      const lower = w.type.toLowerCase();
-      let matched = false;
-      for (const [cat, keywords] of Object.entries(typeMap)) {
-        if (keywords.some(k => lower.includes(k))) { totals[cat] += w.mins; matched = true; break; }
-      }
-      if (!matched) totals.strength += w.mins;
+        const lower = w.type.toLowerCase();
+        let matched = false;
+        for (const [cat, keywords] of Object.entries(typeMap)) {
+            if (keywords.some(k => lower.includes(k))) { totals[cat] += w.mins; matched = true; break; }
+        }
+        if (!matched) totals.strength += w.mins;
     });
     return totals;
   }, [data.workouts]);
 
   const clearAll = useCallback(() => {
-    setData(() => persist({ ...DEFAULT_DATA }));
-  }, []);
+    setData(() => persist({ ...DEFAULT_DATA }, userEmail));
+  }, [userEmail]);
 
   return {
     data,

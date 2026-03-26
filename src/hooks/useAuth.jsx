@@ -10,13 +10,18 @@ export function AuthProvider({ children }) {
   const [userName, setUserName] = useState(
     () => localStorage.getItem('fitmind_username') || 'User'
   );
+  const [userEmail, setUserEmail] = useState(
+    () => localStorage.getItem('fitmind_useremail') || ''
+  );
   const [showAuthModal, setShowAuthModal] = useState(!isAuthenticated);
 
-  const login = (name, token) => {
+  const login = (name, email, token) => {
     setIsAuthenticated(true);
     setUserName(name);
+    setUserEmail(email);
     localStorage.setItem('fitmind_authenticated', '1');
     localStorage.setItem('fitmind_username', name);
+    localStorage.setItem('fitmind_useremail', email);
     if (token) localStorage.setItem('fitmind_token', token);
     setShowAuthModal(false);
   };
@@ -24,14 +29,16 @@ export function AuthProvider({ children }) {
   const logout = () => {
     setIsAuthenticated(false);
     setUserName('User');
+    setUserEmail('');
     localStorage.removeItem('fitmind_authenticated');
     localStorage.removeItem('fitmind_username');
+    localStorage.removeItem('fitmind_useremail');
     localStorage.removeItem('fitmind_token');
     setShowAuthModal(true);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, userName, showAuthModal, setShowAuthModal, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, userName, userEmail, showAuthModal, setShowAuthModal, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,4 +1,5 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_BASE = import.meta.env.VITE_API_URL || (isLocal ? 'http://127.0.0.1:5000' : `http://${window.location.hostname}:5000`);
 
 export async function callAI(prompt) {
   const token = localStorage.getItem('fitmind_token');
