@@ -1,4 +1,8 @@
 import sqlite3
+try:
+    import psycopg2
+except ImportError:
+    psycopg2 = None
 import json
 import os
 import time
@@ -20,6 +24,13 @@ app = Flask(__name__)
 CORS(app)
 
 DB_FILE = 'fitmind_data.db'
+DATABASE_URL = os.getenv('DATABASE_URL')
+
+def get_db_connection():
+    if DATABASE_URL and psycopg2:
+        return psycopg2.connect(DATABASE_URL), 'postgres'
+    else:
+        return sqlite3.connect(DB_FILE), 'sqlite'
 
 # ─── Simple In-Memory Rate Limiter ───
 rate_limit_store = defaultdict(list)
@@ -38,18 +49,31 @@ def is_rate_limited(ip):
 
 
 def init_db():
-    with sqlite3.connect(DB_FILE) as conn:
+    conn, db_type = get_db_connection()
+    try:
         c = conn.cursor()
-        # Create users table
-        c.execute('''
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                email TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL
-            )
-        ''')
+        if db_type == 'postgres':
+            c.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    email TEXT UNIQUE NOT NULL,
+                    password TEXT NOT NULL
+                )
+            ''')
+        else:
+            # Create users table for SQLite
+            c.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    email TEXT UNIQUE NOT NULL,
+                    password TEXT NOT NULL
+                )
+            ''')
         conn.commit()
+    finally:
+        conn.close()
 
 # Initialize DB when the script runs
 init_db()
@@ -75,10 +99,21 @@ def signup():
     hashed_password = generate_password_hash(password)
 
     try:
-        with sqlite3.connect(DB_FILE) as conn:
+        conn, db_type = get_db_connection()
+        try:
             c = conn.cursor()
-            c.execute('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', (name, email, hashed_password))
+            if db_type == 'postgres':
+                c.execute('INSERT INTO users (name, email, password) VALUES (%s, %s, %s)', (name, email, hashed_password))
+            else:
+                c.execute('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', (name, email, hashed_password))
             conn.commit()
+        except Exception as e:
+            # Catch duplicate email errors for both DBs
+            if "UNIQUE constraint failed" in str(e) or "unique constraint" in str(e).lower() or "duplicate key value" in str(e).lower():
+                return jsonify({"error": "This email is already registered."}), 409
+            raise e
+        finally:
+            conn.close()
             
         # Generate JWT token
         token = jwt.encode({
@@ -87,8 +122,7 @@ def signup():
         }, JWT_SECRET, algorithm='HS256')
         
         return jsonify({"success": True, "message": "User registered successfully!", "name": name, "token": token}), 201
-    except sqlite3.IntegrityError:
-        return jsonify({"error": "This email is already registered."}), 409
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -105,10 +139,16 @@ def login():
         return jsonify({"error": "Missing email or password"}), 400
 
     try:
-        with sqlite3.connect(DB_FILE) as conn:
+        conn, db_type = get_db_connection()
+        try:
             c = conn.cursor()
-            c.execute('SELECT name, password FROM users WHERE email = ?', (email,))
+            if db_type == 'postgres':
+                c.execute('SELECT name, password FROM users WHERE email = %s', (email,))
+            else:
+                c.execute('SELECT name, password FROM users WHERE email = ?', (email,))
             user = c.fetchone()
+        finally:
+            conn.close()
 
         if user:
             stored_name, stored_hash = user
@@ -299,7 +339,10 @@ Be specific to what you see, not generic. If the image is blurry or unclear, sti
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
     print(f"FitMind API Server starting on http://0.0.0.0:{port}")
-    print(f"Data will be stored locally in: {DB_FILE}")
+    if os.getenv('DATABASE_URL'):
+        print(f"Data will be stored ONLINE in PostgreSQL Database!")
+    else:
+        print(f"Data will be stored locally in: {DB_FILE}")
     print(f"API Key loaded: {'✅ Yes' if os.getenv('GROQ_API_KEY') else '❌ No — add GROQ_API_KEY to .env!'}")
     app.run(host='0.0.0.0', port=port, debug=False)
 

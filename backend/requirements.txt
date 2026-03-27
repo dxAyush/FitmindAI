@@ -4,3 +4,4 @@ pyjwt
 werkzeug
 requests
 python-dotenv
+psycopg2-binary
