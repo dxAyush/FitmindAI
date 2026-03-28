@@ -1,22 +1,36 @@
+# Standard library imports
+import json
+import os
+import re
 import sqlite3
+import time
+from collections import defaultdict
+from datetime import datetime, timedelta, timezone
+
+# Third-party imports
+import jwt
+import requests
+from dotenv import load_dotenv
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from werkzeug.security import generate_password_hash, check_password_hash
+
+# Optional: PostgreSQL support (used on Render, falls back to SQLite locally)
 try:
     import psycopg2
 except ImportError:
     psycopg2 = None
-import json
-import os
-import time
-import requests
-import jwt
-from datetime import datetime, timedelta, timezone
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-from werkzeug.security import generate_password_hash, check_password_hash
-from dotenv import load_dotenv
-from collections import defaultdict
 
 # Load API key from .env file instead of hardcoding
 load_dotenv()
+
+def sanitize_email(value):
+    """Remove ALL whitespace/newlines from email and lowercase it."""
+    return re.sub(r'[\s\r\n\t]+', '', value).lower()
+
+def sanitize_text(value):
+    """Strip leading/trailing whitespace and collapse internal newlines."""
+    return re.sub(r'[\r\n]+', ' ', value).strip()
 JWT_SECRET = os.getenv('JWT_SECRET', 'super_secret_fitmind_key_123')
 
 app = Flask(__name__)
@@ -84,8 +98,8 @@ def signup():
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
-    name = data.get('name', '').strip()
-    email = data.get('email', '').strip().lower()
+    name = sanitize_text(data.get('name', ''))
+    email = sanitize_email(data.get('email', ''))
     password = data.get('password', '').strip()
 
     if not all([name, email, password]):
@@ -132,7 +146,7 @@ def login():
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
-    email = data.get('email', '').strip().lower()
+    email = sanitize_email(data.get('email', ''))
     password = data.get('password', '').strip()
 
     if not all([email, password]):
