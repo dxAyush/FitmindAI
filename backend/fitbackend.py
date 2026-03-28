@@ -21,8 +21,9 @@ try:
 except ImportError:
     psycopg2 = None
 
-# Load API key from .env file instead of hardcoding
-load_dotenv()
+# Load API key from .env file explicitly from the backend folder
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 def sanitize_email(value):
     """Remove ALL whitespace/newlines from email and lowercase it."""
